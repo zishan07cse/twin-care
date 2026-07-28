@@ -1,0 +1,1 @@
+ALTER TYPE public.visit_target_type ADD VALUE IF NOT EXISTS 'office';
