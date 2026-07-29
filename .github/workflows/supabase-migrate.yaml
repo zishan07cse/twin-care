@@ -1,4 +1,4 @@
-name: Supabase Database Migration
+name: Build and Push Docker Image
 
 on:
   push:
@@ -6,28 +6,23 @@ on:
       - main
 
 jobs:
-  migrate:
+  docker:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Install Supabase CLI
-        uses: supabase/setup-cli@v1
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          version: latest
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Login to Supabase
+      - name: Build Docker Image
         run: |
-          supabase login --token "${{ secrets.SUPABASE_ACCESS_TOKEN }}"
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/twin-care:latest .
 
-      - name: Link Supabase Project
+      - name: Push Docker Image
         run: |
-          supabase link --project-ref "ctnaikjcivxpgiopdlna"
-
-      - name: Push Database Migrations
-        env:
-          SUPABASE_DB_PASSWORD: "LJVQGk98qLegvsyk"
-        run: |
-          supabase db push --db-url "${{ secrets.SUPABASE_DB_URL }}"
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/twin-care:latest
