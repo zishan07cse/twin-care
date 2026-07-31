@@ -1,20 +1,16 @@
-# Build Stage
-FROM node:20-alpine AS builder
+FROM node:22-alpine
 
 WORKDIR /app
 
 COPY package*.json ./
+
 RUN npm install
 
 COPY . .
 
-RUN npm run build
+ENV HOST=0.0.0.0
+ENV PORT=8080
 
-# Production Stage
-FROM nginx:alpine
+EXPOSE 8080
 
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "8080"]
